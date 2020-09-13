@@ -6,6 +6,7 @@ PREFIX = "~"
 
 cmds = {
     "hello": misc.hello,
+    "greet": misc.greet,
 }
 
 

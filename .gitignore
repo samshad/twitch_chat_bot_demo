@@ -1,3 +1,6 @@
 venv/
 Auth/
 .idea/
+lib/database.db
+lib/cmds/__pycache__/
+00.py

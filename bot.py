@@ -1,7 +1,7 @@
 from irc.bot import SingleServerIRCBot
 import requests
 from Auth.auth import oauth, client_id
-from lib import cmds
+from lib import db, cmds, react
 
 
 class Bot(SingleServerIRCBot):
@@ -13,6 +13,7 @@ class Bot(SingleServerIRCBot):
         self.client_id = client_id
         self.token = oauth
         self.channel = f"#amiparina"
+        # self.channel = f"#vultplay"
 
         url = f"https://api.twitch.tv/kraken/users?login={self.bot_name}"
         headers = {"Client-ID": self.client_id, "Accept": "application/vnd.twitchtv.v5+json"}
@@ -27,17 +28,20 @@ class Bot(SingleServerIRCBot):
             cxn.cap("REQ", f":twitch.tv/{req}")
 
         cxn.join(self.channel)
+        db.build()
         self.send_message("Now online!!!")
 
     """On public messages"""
+    @db.with_commit
     def on_pubmsg(self, cxn, event):
         tags = {kvpair["key"]: kvpair["value"] for kvpair in event.tags}
         user = {"name": tags["display-name"], "id": tags["user-id"]}
         message = event.arguments[0]
 
         if user["name"] != self.bot_name:
+            react.process(bot, user, message)
             cmds.process(bot, user, message)
-            print(f"{user['name']}: {message}")
+            # print(f"{user['name']}: {message}")
 
     """Send message"""
     def send_message(self, message):
